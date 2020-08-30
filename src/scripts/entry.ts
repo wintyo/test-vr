@@ -2,11 +2,12 @@ import '../css/base.scss';
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { VRButton } from 'three/examples/jsm/webxr/VRButton';
 import * as dat from 'dat.gui';
 
 // constants
-const WIDTH = 960;
-const HEIGHT = 540;
+const WIDTH = Math.min(window.innerWidth, 960);
+const HEIGHT = Math.min(window.innerHeight, 540);
 
 // ヘルパーの用意
 const axesHelper = new THREE.AxesHelper(10);
@@ -34,6 +35,9 @@ renderer.setSize(WIDTH, HEIGHT);
 const elApp = document.getElementById('app');
 elApp?.appendChild(renderer.domElement);
 
+renderer.xr.enabled = true;
+document.body.appendChild(VRButton.createButton(renderer));
+
 // シーンの作成
 const scene = new THREE.Scene();
 
@@ -50,6 +54,14 @@ scene.add(box);
 const camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 1, 10000);
 camera.position.set(0, 0, 5);
 
+// VR用のカメラを配置
+const cameraContainer = new THREE.Object3D();
+cameraContainer.add(camera);
+cameraContainer.position.x = 0;
+cameraContainer.position.y = 0;
+cameraContainer.position.z = 2;
+scene.add(cameraContainer);
+
 // ライトの設定
 const light = new THREE.DirectionalLight(0xffffff);
 light.intensity = 2;
@@ -61,11 +73,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.2;
 
-// ループ処理
-function tick() {
+renderer.setAnimationLoop(() => {
   controls.update();
   renderer.render(scene, camera);
-  requestAnimationFrame(tick);
-}
-
-tick();
+});

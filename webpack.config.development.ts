@@ -22,6 +22,8 @@ const config = merge(baseConfig, {
     inline: true,
     overlay: true,
     port: 3050,
+    // スマホからアクセスして試す場合はhttpsにする
+    // https: true,
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
